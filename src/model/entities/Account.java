@@ -1,20 +1,21 @@
 package model.entities;
 
+import model.exceptions.BusinessException;
+
 public class Account {
 
 	private Integer number;
 	private String holder;
-	private Double balance;
+	protected Double balance = 0d;
 	private Double withdrawLimit;
 	
 	public Account() {
 	}
 	
-	public Account(Integer number, String holder, Double balance, Double withdrawLimit) {
-		super();
+	public Account(Integer number, String holder, Double initialDeposit, Double withdrawLimit) {
 		this.number = number;
 		this.holder = holder;
-		this.balance = balance;
+		deposit(initialDeposit);
 		this.withdrawLimit = withdrawLimit;
 	}
 
@@ -46,11 +47,21 @@ public class Account {
 		this.withdrawLimit = withdrawLimit;
 	}
 	
-	public void deposit (Double amount) {
-		this.balance += amount;
+	public void deposit(double initialDeposit) {
+		this.balance += initialDeposit;
 	}
 	
 	public void withdraw (Double amount) {
+		validateWithdraw(amount);
 		this.balance -= amount;
+	}
+	
+	private void validateWithdraw(Double amount) {
+		if (amount > getWithdrawLimit()) {
+			throw new BusinessException("The amount exceeds withdraw limit");
+		}
+		if (amount > getBalance()) {
+			throw new BusinessException("Not enough balance");
+		}
 	}
 }
